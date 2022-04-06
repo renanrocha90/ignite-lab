@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthorizationGuard } from 'src/http/auth/authorization.guard';
 import { AuthUser, CurrentUser } from 'src/http/auth/current-user';
 import { CoursesService } from 'src/services/courses.service';
 import { EnrollmentsService } from 'src/services/enrollments.service';
@@ -17,16 +18,14 @@ export class CoursesResolver {
     ) { }
 
     @Query(() => [Course])
-    // @UseGuards(AuthorizationGuard)
+    @UseGuards(AuthorizationGuard)
     courses() {
         return this.coursesService.findAllCourses();
     }
 
     @Query(() => Course)
-    // @UseGuards(AuthorizationGuard)
-    async course(
-        @Args('id') id: string,
-        @CurrentUser() user: AuthUser) {
+    @UseGuards(AuthorizationGuard)
+    async course(@Args('id') id: string, @CurrentUser() user: AuthUser) {
         const student = await this.studentsService.findStudentByAuthUserId(user.sub);
 
         if (!student) {
@@ -41,10 +40,12 @@ export class CoursesResolver {
         if (!enrollment) {
             throw new UnauthorizedException();
         }
+
+        return this.coursesService.findCourseById(id);
     }
 
     @Mutation(() => Course)
-    // @UseGuards(AuthorizationGuard)
+    @UseGuards(AuthorizationGuard)
     createCourse(
         @Args('data') data: CreateCourseInput,
     ) {

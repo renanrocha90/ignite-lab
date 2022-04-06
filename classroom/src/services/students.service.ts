@@ -2,25 +2,36 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 
+interface CreateStudentParams {
+    authUserId: string;
+}
 @Injectable()
 export class StudentsService {
     constructor(private prisma: PrismaService) { }
 
-    async findAllStudents() {
-        return await this.prisma.student.findMany();
+    findAllStudents() {
+        return this.prisma.student.findMany();
     }
 
-    async findStudentById(studentId: string) {
-        return await this.prisma.student.findUnique({
+    findStudentById(id: string) {
+        return this.prisma.student.findUnique({
             where: {
-                id: studentId,
+                id,
             },
         });
     }
 
-    async findStudentByAuthUserId(authUserId: string) {
-        return await this.prisma.student.findUnique({
+    findStudentByAuthUserId(authUserId: string) {
+        return this.prisma.student.findUnique({
             where: {
+                authUserId,
+            },
+        });
+    }
+
+    createStudent({ authUserId }: CreateStudentParams) {
+        return this.prisma.student.create({
+            data: {
                 authUserId,
             },
         });

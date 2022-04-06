@@ -11,10 +11,10 @@ interface CreateCustomerParams {
 export class CustomersService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async findCustomerByAuthUserId(id: string): Promise<any> {
+    async findCustomerByAuthUserId(authUserId: string): Promise<any> {
         return await this.prisma.customer.findUnique({
             where: {
-                id,
+                authUserId,
             },
         });
     }

@@ -2,6 +2,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/database/prisma/prisma.service';
 
+interface CreateEnrollmentParams {
+    courseId: string;
+    studentId: string;
+}
 interface findEnrollmentByCourseAndStudentParams {
     courseId: string;
     studentId: string;
@@ -11,8 +15,8 @@ interface findEnrollmentByCourseAndStudentParams {
 export class EnrollmentsService {
     constructor(private prisma: PrismaService) { }
 
-    async findAllEnrollments() {
-        return await this.prisma.enrollment.findMany({
+    findAllEnrollments() {
+        return this.prisma.enrollment.findMany({
             where: {
                 canceledAt: null,
             },
@@ -22,8 +26,8 @@ export class EnrollmentsService {
         });
     }
 
-    async findEnrollmentByStudent(studentId: string) {
-        return await this.prisma.enrollment.findMany({
+    findEnrollmentByStudent(studentId: string) {
+        return this.prisma.enrollment.findMany({
             where: {
                 studentId,
                 canceledAt: null,
@@ -34,12 +38,21 @@ export class EnrollmentsService {
         });
     }
 
-    async findEnrollmentByCourseAndStudent({ courseId, studentId }: findEnrollmentByCourseAndStudentParams) {
-        return await this.prisma.enrollment.findFirst({
+    findEnrollmentByCourseAndStudent({ courseId, studentId }: findEnrollmentByCourseAndStudentParams) {
+        return this.prisma.enrollment.findFirst({
             where: {
                 courseId,
                 studentId,
                 canceledAt: null,
+            },
+        });
+    }
+
+    createEnrollment({ courseId, studentId }: CreateEnrollmentParams) {
+        return this.prisma.enrollment.create({
+            data: {
+                courseId,
+                studentId,
             },
         });
     }
